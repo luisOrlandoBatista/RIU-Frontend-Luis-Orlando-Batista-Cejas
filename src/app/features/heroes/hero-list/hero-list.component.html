@@ -1,6 +1,12 @@
 <div class="hero-list-container">
   <h1>Superhéroes</h1>
 
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Buscar héroe</mat-label>
+    <input matInput [formControl]="searchControl" placeholder="Nombre o superhéroe...">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
   @if (isLoading()) {
     <div class="loading-wrapper">
       <mat-spinner diameter="48" />
@@ -44,5 +50,9 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+
+    @if (heroes().length === 0) {
+      <p class="no-results">No se encontraron héroes.</p>
+    }
   }
 </div>
