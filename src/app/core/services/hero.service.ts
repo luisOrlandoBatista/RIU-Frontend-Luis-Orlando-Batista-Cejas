@@ -1,4 +1,6 @@
 import { Injectable, signal } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 import { Hero, Universe } from '../../models/hero.model';
 
@@ -15,34 +17,40 @@ export class HeroService {
     { id: '6', name: 'Diana Prince', heroName: 'Wonder Woman', power: 'Fuerza sobrehumana, látigo de la verdad', universe: Universe.DC },
   ]);
 
-  getAll(): Hero[] {
-    return this.heroes();
+  getAll(): Observable<Hero[]> {
+    return of(this.heroes()).pipe(delay(1000));
   }
 
-  getById(id: string): Hero | undefined {
-    return this.heroes().find(hero => hero.id === id);
+  getById(id: string): Observable<Hero | undefined> {
+    return of(this.heroes().find(hero => hero.id === id)).pipe(delay(1000));
   }
 
-  search(term: string): Hero[] {
+  search(term: string): Observable<Hero[]> {
     const text = term.trim().toLowerCase();
-    if (!text) return this.heroes();
-    return this.heroes().filter(hero => hero.name.toLowerCase().includes(text) || hero.heroName.toLowerCase().includes(text));
+    const result = !text
+      ? this.heroes()
+      : this.heroes().filter(hero =>
+          hero.name.toLowerCase().includes(text) ||
+          hero.heroName.toLowerCase().includes(text)
+        );
+    return of(result).pipe(delay(1000));
   }
 
-  create(data: Hero): Hero {
+  create(data: Hero): Observable<Hero> {
     const newHero: Hero = { ...data, id: crypto.randomUUID() };
     this.heroes.update(current => [...current, newHero]);
-    return newHero;
+    return of(newHero).pipe(delay(1000));
   }
 
-  update(updated: Hero): Hero {
+  update(updated: Hero): Observable<Hero> {
     this.heroes.update(current =>
       current.map(hero => hero.id === updated.id ? updated : hero)
     );
-    return updated;
+    return of(updated).pipe(delay(1000));
   }
 
-  delete(id: string): void {
+  delete(id: string): Observable<void> {
     this.heroes.update(current => current.filter(hero => hero.id !== id));
+    return of(undefined).pipe(delay(1000));
   }
 }
