@@ -4,6 +4,8 @@ import { delay } from 'rxjs/operators';
 
 import { Hero, Universe } from '../../models/hero.model';
 
+const SIMULATED_DELAY = 1000;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -18,11 +20,11 @@ export class HeroService {
   ]);
 
   getAll(): Observable<Hero[]> {
-    return of(this.heroes()).pipe(delay(1000));
+    return of(this.heroes()).pipe(delay(SIMULATED_DELAY));
   }
 
   getById(id: string): Observable<Hero | undefined> {
-    return of(this.heroes().find(hero => hero.id === id)).pipe(delay(1000));
+    return of(this.heroes().find(hero => hero.id === id)).pipe(delay(SIMULATED_DELAY));
   }
 
   search(term: string): Observable<Hero[]> {
@@ -33,24 +35,24 @@ export class HeroService {
           hero.name.toLowerCase().includes(text) ||
           hero.heroName.toLowerCase().includes(text)
         );
-    return of(result).pipe(delay(1000));
+    return of(result).pipe(delay(SIMULATED_DELAY));
   }
 
   create(data: Hero): Observable<Hero> {
     const newHero: Hero = { ...data, id: crypto.randomUUID() };
     this.heroes.update(current => [...current, newHero]);
-    return of(newHero).pipe(delay(1000));
+    return of(newHero).pipe(delay(SIMULATED_DELAY));
   }
 
   update(updated: Hero): Observable<Hero> {
     this.heroes.update(current =>
       current.map(hero => hero.id === updated.id ? updated : hero)
     );
-    return of(updated).pipe(delay(1000));
+    return of(updated).pipe(delay(SIMULATED_DELAY));
   }
 
   delete(id: string): Observable<void> {
     this.heroes.update(current => current.filter(hero => hero.id !== id));
-    return of(undefined).pipe(delay(1000));
+    return of(undefined).pipe(delay(SIMULATED_DELAY));
   }
 }
