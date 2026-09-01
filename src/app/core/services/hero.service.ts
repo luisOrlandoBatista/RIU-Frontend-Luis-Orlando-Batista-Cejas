@@ -18,4 +18,31 @@ export class HeroService {
   getAll(): Hero[] {
     return this.heroes();
   }
+
+  getById(id: string): Hero | undefined {
+    return this.heroes().find(hero => hero.id === id);
+  }
+
+  search(term: string): Hero[] {
+    const text = term.trim().toLowerCase();
+    if (!text) return this.heroes();
+    return this.heroes().filter(hero => hero.name.toLowerCase().includes(text) || hero.heroName.toLowerCase().includes(text));
+  }
+
+  create(data: Hero): Hero {
+    const newHero: Hero = { ...data, id: crypto.randomUUID() };
+    this.heroes.update(current => [...current, newHero]);
+    return newHero;
+  }
+
+  update(updated: Hero): Hero {
+    this.heroes.update(current =>
+      current.map(hero => hero.id === updated.id ? updated : hero)
+    );
+    return updated;
+  }
+
+  delete(id: string): void {
+    this.heroes.update(current => current.filter(hero => hero.id !== id));
+  }
 }
