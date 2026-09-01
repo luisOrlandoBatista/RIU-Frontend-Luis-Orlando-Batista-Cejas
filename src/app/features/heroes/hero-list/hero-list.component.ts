@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -16,6 +17,7 @@ import { Hero } from '../../../models/hero.model';
   imports: [
     ReactiveFormsModule,
     MatTableModule,
+    MatPaginatorModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
@@ -30,8 +32,15 @@ export class HeroListComponent implements OnInit {
 
   readonly heroes = signal<Hero[]>([]);
   readonly isLoading = signal(true);
+  readonly totalHeroes = signal(0);
   readonly displayedColumns = ['name', 'heroName', 'power', 'universe', 'actions'];
   readonly searchControl = new FormControl('');
+
+  readonly pageSize = 5;
+  readonly pageSizeOptions = [5, 10, 15, 20];
+
+  private currentPage = 0;
+  private currentPageSize = this.pageSize;
 
   ngOnInit(): void {
     this.loadHeroes();
@@ -39,21 +48,27 @@ export class HeroListComponent implements OnInit {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-    ).subscribe(term => this.searchHeroes(term ?? ''));
-  }
-
-  private loadHeroes(): void {
-    this.isLoading.set(true);
-    this.heroService.getAll().subscribe(heroes => {
-      this.heroes.set(heroes);
-      this.isLoading.set(false);
+    ).subscribe(term => {
+      this.currentPage = 0;
+      this.fetchHeroes(term ?? '');
     });
   }
 
-  private searchHeroes(term: string): void {
+  onPageChange(event: PageEvent): void {
+    this.currentPage = event.pageIndex;
+    this.currentPageSize = event.pageSize;
+    this.fetchHeroes(this.searchControl.value ?? '');
+  }
+
+  private loadHeroes(): void {
+    this.fetchHeroes('');
+  }
+
+  private fetchHeroes(term: string): void {
     this.isLoading.set(true);
-    this.heroService.search(term).subscribe(heroes => {
-      this.heroes.set(heroes);
+    this.heroService.search(term, this.currentPage, this.currentPageSize).subscribe(result => {
+      this.heroes.set(result.data);
+      this.totalHeroes.set(result.total);
       this.isLoading.set(false);
     });
   }

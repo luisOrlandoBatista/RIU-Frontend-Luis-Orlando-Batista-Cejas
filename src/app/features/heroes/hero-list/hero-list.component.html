@@ -51,8 +51,15 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
-    @if (heroes().length === 0) {
+    @if (totalHeroes() === 0) {
       <p class="no-results">No se encontraron héroes.</p>
     }
   }
+
+  <mat-paginator
+    [length]="totalHeroes()"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onPageChange($event)"
+    showFirstLastButtons />
 </div>

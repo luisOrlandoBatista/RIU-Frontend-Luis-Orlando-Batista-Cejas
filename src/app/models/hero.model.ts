@@ -11,3 +11,8 @@ export interface Hero {
   power: string;     // Por ahora lo dejo como string
   universe: Universe;
 }
+
+export interface PageResult {
+  data: Hero[];
+  total: number;
+}

@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
-import { Hero, Universe } from '../../models/hero.model';
+import {Hero, PageResult, Universe} from '../../models/hero.model';
 
 const SIMULATED_DELAY = 1000;
 
@@ -19,23 +19,28 @@ export class HeroService {
     { id: '6', name: 'Diana Prince', heroName: 'Wonder Woman', power: 'Fuerza sobrehumana, látigo de la verdad', universe: Universe.DC },
   ]);
 
-  getAll(): Observable<Hero[]> {
-    return of(this.heroes()).pipe(delay(SIMULATED_DELAY));
+  getAll(page: number, pageSize: number): Observable<PageResult> {
+    const heroes = this.heroes();
+    const start = page * pageSize;
+    const data = heroes.slice(start, start + pageSize);
+    return of({ data, total: heroes.length } as PageResult).pipe(delay(SIMULATED_DELAY));
   }
 
   getById(id: string): Observable<Hero | undefined> {
     return of(this.heroes().find(hero => hero.id === id)).pipe(delay(SIMULATED_DELAY));
   }
 
-  search(term: string): Observable<Hero[]> {
+  search(term: string, page: number, pageSize: number): Observable<PageResult> {
     const text = term.trim().toLowerCase();
-    const result = !text
+    const filtered = !text
       ? this.heroes()
       : this.heroes().filter(hero =>
           hero.name.toLowerCase().includes(text) ||
           hero.heroName.toLowerCase().includes(text)
         );
-    return of(result).pipe(delay(SIMULATED_DELAY));
+    const start = page * pageSize;
+    const data = filtered.slice(start, start + pageSize);
+    return of({ data, total: filtered.length }).pipe(delay(SIMULATED_DELAY));
   }
 
   create(data: Hero): Observable<Hero> {
