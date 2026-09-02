@@ -108,9 +108,10 @@ describe('HeroService', () => {
   });
 
   describe('método create', () => {
-    it('debería añadir un nuevo héroe a la lista', fakeAsync(() => {
+    it('debería añadir un nuevo héroe a la lista con el id generado', fakeAsync(() => {
+      const generatedId = service.generateId();
       const data: Hero = {
-        id: '',
+        id: generatedId,
         name: 'Bruce Banner',
         heroName: 'Hulk',
         power: 'Super fuerza ilimitada',
@@ -122,7 +123,7 @@ describe('HeroService', () => {
       tick(DELAY);
 
       expect(created).toBeDefined();
-      expect(created?.id).toBeTruthy();
+      expect(created?.id).toBe(generatedId);
 
       let result: PageResult | undefined;
       service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
@@ -130,7 +131,7 @@ describe('HeroService', () => {
       expect(result?.total).toBe(7);
     }));
 
-    it('debería asignar un id único generado, ignorando el id del parámetro', fakeAsync(() => {
+    it('debería conservar el id si tiene id', fakeAsync(() => {
       const data: Hero = {
         id: 'id-manual',
         name: 'Wanda Maximoff',
@@ -142,7 +143,7 @@ describe('HeroService', () => {
       let created: Hero | undefined;
       service.create(data).subscribe(result => (created = result));
       tick(DELAY);
-      expect(created?.id).not.toBe('id-manual');
+      expect(created?.id).toBe('id-manual');
     }));
   });
 

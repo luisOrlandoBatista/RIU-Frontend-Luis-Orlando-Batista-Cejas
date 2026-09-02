@@ -9,9 +9,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDialog } from '@angular/material/dialog';
 
 import { HeroService } from '../../../core/services/hero.service';
 import { Hero } from '../../../models/hero.model';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-hero-list',
@@ -31,6 +33,7 @@ import { Hero } from '../../../models/hero.model';
 export class HeroListComponent implements OnInit {
   private readonly heroService = inject(HeroService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
 
   readonly heroes = signal<Hero[]>([]);
   readonly isLoading = signal(true);
@@ -68,6 +71,24 @@ export class HeroListComponent implements OnInit {
 
   editHero(id: string): void {
     this.router.navigate(['/heroes', id, 'edit']);
+  }
+
+  deleteHero(hero: Hero): void {
+    const message = '¿Estás seguro de que quieres eliminar a ' + hero.heroName;
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Eliminar héroe',
+        message: message
+      },
+    }).afterClosed().subscribe((modified: boolean) => {
+      if (modified) {
+        this.isLoading.set(true);
+        this.heroService.delete(hero.id).subscribe(() => {
+          this.getHeroes(this.searchControl.value ?? '');
+        });
+      }
+    });
   }
 
   private loadHeroes(): void {

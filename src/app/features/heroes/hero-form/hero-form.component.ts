@@ -14,7 +14,6 @@ import { UppercaseDirective } from '../../../shared/directives/uppercase.directi
 
 @Component({
   selector: 'app-hero-form',
-  host: { class: 'block flex-1' },
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
