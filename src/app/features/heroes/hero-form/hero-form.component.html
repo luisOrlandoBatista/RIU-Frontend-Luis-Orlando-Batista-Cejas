@@ -4,68 +4,78 @@
     <button mat-icon-button (click)="onCancel()">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <h1 class="text-3xl font-bold text-gray-800">Nuevo Héroe</h1>
+    <h1 class="text-3xl font-bold text-gray-800">
+      {{ isEditMode() ? 'Editar Héroe' : 'Nuevo Héroe' }}
+    </h1>
   </div>
 
   <div class="rounded-lg bg-white p-6 shadow-sm">
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
 
-      <mat-form-field appearance="outline">
-        <mat-label>Nombre real</mat-label>
-        <input matInput formControlName="name" placeholder="Ej: Peter Parker">
-        @if (name.hasError('required')) {
-          <mat-error>Este campo es obligatorio.</mat-error>
-        } @else if (name.hasError('minlength')) {
-          <mat-error>Mínimo 2 caracteres.</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Nombre de superhéroe</mat-label>
-        <input matInput formControlName="heroName" placeholder="Ej: Spider-Man">
-        @if (heroName.hasError('required')) {
-          <mat-error>Este campo es obligatorio.</mat-error>
-        } @else if (heroName.hasError('minlength')) {
-          <mat-error>Mínimo 2 caracteres.</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Poder principal</mat-label>
-        <input matInput formControlName="power" placeholder="Ej: Trepar paredes">
-        @if (power.hasError('required')) {
-          <mat-error>Este campo es obligatorio.</mat-error>
-        } @else if (power.hasError('minlength')) {
-          <mat-error>Mínimo 2 caracteres.</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Universo</mat-label>
-        <mat-select formControlName="universe">
-          @for (universe of universes; track universe) {
-            <mat-option [value]="universe">{{ universe }}</mat-option>
-          }
-        </mat-select>
-        @if (universe.hasError('required')) {
-          <mat-error>Este campo es obligatorio.</mat-error>
-        }
-      </mat-form-field>
-
-      <div class="flex justify-end gap-3 pt-2">
-        <button mat-stroked-button type="button" (click)="onCancel()">
-          Cancelar
-        </button>
-        <button mat-flat-button type="submit" [disabled]="form.invalid || isSaving()">
-          @if (isSaving()) {
-            <mat-spinner class="opacity-50" diameter="18" />
-          } @else {
-            Guardar
-          }
-        </button>
+    @if (isLoading()) {
+      <div class="flex justify-center py-8">
+        <mat-spinner diameter="48" />
       </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
 
-    </form>
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre real</mat-label>
+          <input matInput formControlName="name" placeholder="Ej: Peter Parker">
+          @if (name.hasError('required')) {
+            <mat-error>Este campo es obligatorio.</mat-error>
+          } @else if (name.hasError('minlength')) {
+            <mat-error>Mínimo 2 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre de superhéroe</mat-label>
+          <input matInput formControlName="heroName" placeholder="Ej: Spider-Man">
+          @if (heroName.hasError('required')) {
+            <mat-error>Este campo es obligatorio.</mat-error>
+          } @else if (heroName.hasError('minlength')) {
+            <mat-error>Mínimo 2 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Poder principal</mat-label>
+          <input matInput formControlName="power" placeholder="Ej: Trepar paredes">
+          @if (power.hasError('required')) {
+            <mat-error>Este campo es obligatorio.</mat-error>
+          } @else if (power.hasError('minlength')) {
+            <mat-error>Mínimo 2 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Universo</mat-label>
+          <mat-select formControlName="universe">
+            @for (universe of universes; track universe) {
+              <mat-option [value]="universe">{{ universe }}</mat-option>
+            }
+          </mat-select>
+          @if (universe.hasError('required')) {
+            <mat-error>Este campo es obligatorio.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button mat-stroked-button type="button" (click)="onCancel()">
+            Cancelar
+          </button>
+          <button mat-flat-button type="submit" [disabled]="form.invalid || isSaving()">
+            @if (isSaving()) {
+              <mat-spinner class="opacity-50" diameter="18" />
+            } @else {
+              {{ isEditMode() ? 'Actualizar' : 'Guardar' }}
+            }
+          </button>
+        </div>
+
+      </form>
+    }
+
   </div>
 
 </div>

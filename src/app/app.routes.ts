@@ -12,6 +12,11 @@ export const routes: Routes = [
       import('./features/heroes/hero-form/hero-form.component').then(m => m.HeroFormComponent),
   },
   {
+    path: 'heroes/:id/edit',
+    loadComponent: () =>
+      import('./features/heroes/hero-form/hero-form.component').then(m => m.HeroFormComponent),
+  },
+  {
     path: '',
     redirectTo: 'heroes',
     pathMatch: 'full',

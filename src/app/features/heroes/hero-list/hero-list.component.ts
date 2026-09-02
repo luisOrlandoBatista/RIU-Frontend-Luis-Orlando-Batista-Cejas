@@ -66,6 +66,10 @@ export class HeroListComponent implements OnInit {
     this.router.navigate(['/heroes/new']);
   }
 
+  editHero(id: string): void {
+    this.router.navigate(['/heroes', id, 'edit']);
+  }
+
   private loadHeroes(): void {
     this.getHeroes();
   }

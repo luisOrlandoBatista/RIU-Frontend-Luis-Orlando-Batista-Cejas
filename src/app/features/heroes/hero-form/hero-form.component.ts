@@ -1,6 +1,6 @@
-import {Component, inject, signal} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -13,6 +13,7 @@ import { Hero, Universe } from '../../../models/hero.model';
 
 @Component({
   selector: 'app-hero-form',
+  host: { class: 'block flex-1' },
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
@@ -25,11 +26,14 @@ import { Hero, Universe } from '../../../models/hero.model';
   templateUrl: './hero-form.component.html',
   styleUrl: './hero-form.component.scss',
 })
-export class HeroFormComponent {
+export class HeroFormComponent implements OnInit {
   private readonly heroService = inject(HeroService);
   private readonly router = inject(Router);
-  readonly universes = Object.values(Universe);
+  private readonly route = inject(ActivatedRoute);
 
+  readonly universes = Object.values(Universe);
+  readonly isEditMode = signal(false);
+  readonly isLoading = signal(false);
   readonly isSaving = signal(false);
 
   readonly form = new FormGroup({
@@ -41,29 +45,59 @@ export class HeroFormComponent {
   });
 
   get name() {
-    return (this.form.get('name') as FormControl);
+    return this.form.get('name') as FormControl;
   }
 
   get heroName() {
-    return (this.form.get('heroName') as FormControl);
+    return this.form.get('heroName') as FormControl;
   }
-
-  get power() {
-    return (this.form.get('power') as FormControl);
+  get power()    {
+    return this.form.get('power') as FormControl;
   }
-
   get universe() {
-    return (this.form.get('universe') as FormControl);
+    return this.form.get('universe') as FormControl;
+  }
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.isEditMode.set(true);
+      this.isLoading.set(true);
+      this.form.disable();
+
+      this.heroService.getById(id).subscribe(hero => {
+        this.isLoading.set(false);
+        if (hero) {
+          this.form.patchValue(hero);
+          this.form.enable();
+        } else {
+          this.router.navigate(['/heroes']);
+        }
+      });
+    }
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
-    this.isSaving.set(true);
-    const heroData: Hero = { ...this.form.getRawValue(), id: this.heroService.generateId()};
-    this.heroService.create(heroData).subscribe(() => {
-      this.isSaving.set(false);
-      this.router.navigate(['/heroes']);
-    });
+    if (this.form.valid) {
+      this.isSaving.set(true);
+      const dataRawValue = this.form.getRawValue();
+      const heroData: Hero = {
+        ...dataRawValue,
+        id: this.isEditMode() ? (dataRawValue.id ?? '') : this.heroService.generateId()
+      };
+      if (this.isEditMode()) {
+        this.heroService.update(heroData).subscribe(() => {
+          this.isSaving.set(false);
+          this.router.navigate(['/heroes']);
+        });
+      } else {
+        // heroData.id = this.heroService.generateId();
+        this.heroService.create(heroData).subscribe(() => {
+          this.isSaving.set(false);
+          this.router.navigate(['/heroes']);
+        });
+      }
+    }
   }
 
   onCancel(): void {
