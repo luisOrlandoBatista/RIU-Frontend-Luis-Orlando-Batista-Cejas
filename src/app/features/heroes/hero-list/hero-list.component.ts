@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { HeroService } from '../../../core/services/hero.service';
 import { Hero } from '../../../models/hero.model';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-hero-list',
@@ -34,6 +35,7 @@ export class HeroListComponent implements OnInit {
   private readonly heroService = inject(HeroService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+  private readonly loadingService = inject(LoadingService);
 
   readonly heroes = signal<Hero[]>([]);
   readonly isLoading = signal(true);
@@ -97,10 +99,12 @@ export class HeroListComponent implements OnInit {
 
   private getHeroes(term: string = ''): void {
     this.isLoading.set(true);
+    this.loadingService.show();
     this.heroService.search(term, this.currentPage, this.currentPageSize).subscribe(result => {
       this.heroes.set(result.data);
       this.totalHeroes.set(result.total);
       this.isLoading.set(false);
+      this.loadingService.hide();
     });
   }
 }
