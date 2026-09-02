@@ -16,12 +16,14 @@
     </mat-form-field>
   </div>
 
-  @if (isLoading()) {
-    <div class="flex flex-col items-center gap-4 py-16 text-gray-500">
-      <mat-spinner diameter="48" />
-      <p>Cargando héroes...</p>
-    </div>
-  } @else {
+  <div class="relative" [class.pointer-events-none]="isLoading()" [class.opacity-50]="isLoading()">
+
+    @if (isLoading()) {
+      <div class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/60 backdrop-blur-sm">
+        <mat-spinner diameter="48" />
+      </div>
+    }
+
     <div class="overflow-x-auto rounded-lg shadow-sm">
       <table mat-table [dataSource]="heroes()" class="w-full">
 
@@ -64,15 +66,17 @@
       </table>
     </div>
 
-    @if (totalHeroes() === 0) {
+    @if (!isLoading() && totalHeroes() === 0) {
       <p class="py-8 text-center text-gray-500">No se encontraron héroes.</p>
     }
-  }
 
-  <mat-paginator
-    [length]="totalHeroes()"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="pageSizeOptions"
-    (page)="onPageChange($event)"
-    showFirstLastButtons />
+    <mat-paginator
+      [length]="totalHeroes()"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+      showFirstLastButtons />
+
+  </div>
+
 </div>
