@@ -1,0 +1,53 @@
+<div class="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+
+  <div class="mb-6 flex items-center gap-3">
+    <button mat-icon-button (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-3xl font-bold text-gray-800">Nuevo Héroe</h1>
+  </div>
+
+  <div class="rounded-lg bg-white p-6 shadow-sm">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre real</mat-label>
+        <input matInput formControlName="name" placeholder="Ej: Peter Parker">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre de superhéroe</mat-label>
+        <input matInput formControlName="heroName" placeholder="Ej: Spider-Man">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Poder principal</mat-label>
+        <input matInput formControlName="power" placeholder="Ej: Trepar paredes">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Universo</mat-label>
+        <mat-select formControlName="universe">
+          @for (universe of universes; track universe) {
+            <mat-option [value]="universe">{{ universe }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button mat-stroked-button type="button" (click)="onCancel()">
+          Cancelar
+        </button>
+        <button mat-flat-button type="submit" [disabled]="form.invalid || isSaving()">
+          @if (isSaving() || true) {
+            <mat-spinner class="opacity-50" disabled diameter="18" />
+          } @else {
+            Guardar
+          }
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

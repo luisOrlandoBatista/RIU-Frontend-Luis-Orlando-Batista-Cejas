@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -29,6 +30,7 @@ import { Hero } from '../../../models/hero.model';
 })
 export class HeroListComponent implements OnInit {
   private readonly heroService = inject(HeroService);
+  private readonly router = inject(Router);
 
   readonly heroes = signal<Hero[]>([]);
   readonly isLoading = signal(true);
@@ -50,21 +52,25 @@ export class HeroListComponent implements OnInit {
       distinctUntilChanged(),
     ).subscribe(term => {
       this.currentPage = 0;
-      this.fetchHeroes(term ?? '');
+      this.getHeroes(term ?? '');
     });
   }
 
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex;
     this.currentPageSize = event.pageSize;
-    this.fetchHeroes(this.searchControl.value ?? '');
+    this.getHeroes(this.searchControl.value ?? '');
+  }
+
+  newHero(): void {
+    this.router.navigate(['/heroes/new']);
   }
 
   private loadHeroes(): void {
-    this.fetchHeroes('');
+    this.getHeroes();
   }
 
-  private fetchHeroes(term: string): void {
+  private getHeroes(term: string = ''): void {
     this.isLoading.set(true);
     this.heroService.search(term, this.currentPage, this.currentPageSize).subscribe(result => {
       this.heroes.set(result.data);

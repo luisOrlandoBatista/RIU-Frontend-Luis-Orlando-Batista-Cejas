@@ -43,8 +43,12 @@ export class HeroService {
     return of({ data, total: filtered.length }).pipe(delay(SIMULATED_DELAY));
   }
 
+  generateId(): string {
+    return crypto.randomUUID();
+  }
+
   create(data: Hero): Observable<Hero> {
-    const newHero: Hero = { ...data, id: crypto.randomUUID() };
+    const newHero: Hero = { ...data, id: data.id ?? this.generateId() };
     this.heroes.update(current => [...current, newHero]);
     return of(newHero).pipe(delay(SIMULATED_DELAY));
   }
