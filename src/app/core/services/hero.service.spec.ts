@@ -1,9 +1,11 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
-import { Hero, Universe } from '../../models/hero.model';
+import { Hero, PageResult, Universe } from '../../models/hero.model';
 import { HeroService } from './hero.service';
 
 const DELAY = 1000;
+const PAGE = 0;
+const PAGE_SIZE = 10;
 
 describe('HeroService', () => {
   let service: HeroService;
@@ -14,11 +16,28 @@ describe('HeroService', () => {
   });
 
   describe('método getAll', () => {
-    it('debería devolver todos los héroes iniciales', fakeAsync(() => {
-      let heroes: Hero[] = [];
-      service.getAll().subscribe(result => (heroes = result));
+    it('debería devolver la primera página de héroes con el total correcto', fakeAsync(() => {
+      let result: PageResult | undefined;
+      service.getAll(0, 5).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBe(6);
+      expect(result?.data.length).toBe(5);
+      expect(result?.total).toBe(6);
+    }));
+
+    it('debería devolver la segunda página con los héroes restantes', fakeAsync(() => {
+      let result: PageResult | undefined;
+      service.getAll(1, 5).subscribe(r => (result = r));
+      tick(DELAY);
+      expect(result?.data.length).toBe(1);
+      expect(result?.total).toBe(6);
+    }));
+
+    it('debería devolver todos los héroes si el pageSize es mayor que el total', fakeAsync(() => {
+      let result: PageResult | undefined;
+      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
+      tick(DELAY);
+      expect(result?.data.length).toBe(6);
+      expect(result?.total).toBe(6);
     }));
   });
 
@@ -41,40 +60,50 @@ describe('HeroService', () => {
 
   describe('método search', () => {
     it('debería devolver todos los héroes si el término está vacío', fakeAsync(() => {
-      let heroes: Hero[] = [];
-      service.search('').subscribe(result => (heroes = result));
+      let result: PageResult | undefined;
+      service.search('', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBe(6);
+      expect(result?.data.length).toBe(6);
+      expect(result?.total).toBe(6);
     }));
 
     it('debería filtrar por nombre real del héroe', fakeAsync(() => {
-      let heroes: Hero[] = [];
-      service.search('peter').subscribe(result => (heroes = result));
+      let result: PageResult | undefined;
+      service.search('peter', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBe(1);
-      expect(heroes[0].heroName).toBe('Spider-Man');
+      expect(result?.data.length).toBe(1);
+      expect(result?.data[0].heroName).toBe('Spider-Man');
     }));
 
     it('debería filtrar por nombre de superhéroe', fakeAsync(() => {
-      let heroes: Hero[] = [];
-      service.search('man').subscribe(result => (heroes = result));
+      let result: PageResult | undefined;
+      service.search('man', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBeGreaterThan(1);
+      expect(result?.total).toBeGreaterThan(1);
     }));
 
     it('debería ser insensible a mayúsculas', fakeAsync(() => {
-      let heroes: Hero[] = [];
-      service.search('CLARK').subscribe(result => (heroes = result));
+      let result: PageResult | undefined;
+      service.search('CLARK', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBe(1);
-      expect(heroes[0].heroName).toBe('Superman');
+      expect(result?.data.length).toBe(1);
+      expect(result?.data[0].heroName).toBe('Superman');
     }));
 
     it('debería devolver lista vacía si no hay coincidencias', fakeAsync(() => {
-      let heroes: Hero[] = [];
-      service.search('zzznomatch').subscribe(result => (heroes = result));
+      let result: PageResult | undefined;
+      service.search('zzznomatch', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBe(0);
+      expect(result?.total).toBe(0);
+      expect(result?.data.length).toBe(0);
+    }));
+
+    it('debería paginar los resultados de búsqueda correctamente', fakeAsync(() => {
+      let result: PageResult | undefined;
+      service.search('man', 0, 2).subscribe(r => (result = r));
+      tick(DELAY);
+      expect(result?.data.length).toBe(2);
+      expect(result?.total).toBeGreaterThan(2);
     }));
   });
 
@@ -95,10 +124,10 @@ describe('HeroService', () => {
       expect(created).toBeDefined();
       expect(created?.id).toBeTruthy();
 
-      let heroes: Hero[] = [];
-      service.getAll().subscribe(result => (heroes = result));
+      let result: PageResult | undefined;
+      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBe(7);
+      expect(result?.total).toBe(7);
     }));
 
     it('debería asignar un id único generado, ignorando el id del parámetro', fakeAsync(() => {
@@ -141,10 +170,10 @@ describe('HeroService', () => {
       service.update({ ...hero!, heroName: 'Super-Man' }).subscribe();
       tick(DELAY);
 
-      let heroes: Hero[] = [];
-      service.getAll().subscribe(result => (heroes = result));
+      let result: PageResult | undefined;
+      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBe(6);
+      expect(result?.total).toBe(6);
     }));
   });
 
@@ -153,21 +182,21 @@ describe('HeroService', () => {
       service.delete('1').subscribe();
       tick(DELAY);
 
-      let heroes: Hero[] = [];
-      service.getAll().subscribe(result => (heroes = result));
+      let result: PageResult | undefined;
+      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBe(5);
-      expect(heroes.find(h => h.id === '1')).toBeUndefined();
+      expect(result?.total).toBe(5);
+      expect(result?.data.find(h => h.id === '1')).toBeUndefined();
     }));
 
     it('no debería modificar la lista si el id no existe', fakeAsync(() => {
       service.delete('999').subscribe();
       tick(DELAY);
 
-      let heroes: Hero[] = [];
-      service.getAll().subscribe(result => (heroes = result));
+      let result: PageResult | undefined;
+      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
-      expect(heroes.length).toBe(6);
+      expect(result?.total).toBe(6);
     }));
   });
 });
