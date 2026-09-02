@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { HeroService } from '../../../core/services/hero.service';
 import { Hero, Universe } from '../../../models/hero.model';
+import { UppercaseDirective } from '../../../shared/directives/uppercase.directive';
 
 @Component({
   selector: 'app-hero-form',
@@ -22,6 +23,7 @@ import { Hero, Universe } from '../../../models/hero.model';
     MatSelectModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    UppercaseDirective,
   ],
   templateUrl: './hero-form.component.html',
   styleUrl: './hero-form.component.scss',
