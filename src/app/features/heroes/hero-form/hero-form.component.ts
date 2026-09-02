@@ -11,7 +11,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeroService } from '../../../core/services/hero.service';
 import { Hero, Universe } from '../../../models/hero.model';
 import { UppercaseDirective } from '../../../shared/directives/uppercase.directive';
-import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-hero-form',
@@ -32,7 +31,6 @@ export class HeroFormComponent implements OnInit {
   private readonly heroService = inject(HeroService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly loadingService = inject(LoadingService);
 
   readonly universes = Object.values(Universe);
   readonly isEditMode = signal(false);
@@ -67,11 +65,9 @@ export class HeroFormComponent implements OnInit {
       this.isEditMode.set(true);
       this.isLoading.set(true);
       this.form.disable();
-      this.loadingService.show();
 
       this.heroService.getById(id).subscribe(hero => {
         this.isLoading.set(false);
-        this.loadingService.hide();
         if (hero) {
           this.form.patchValue(hero);
           this.form.enable();
@@ -85,7 +81,6 @@ export class HeroFormComponent implements OnInit {
   onSubmit(): void {
     if (this.form.valid) {
       this.isSaving.set(true);
-      this.loadingService.show();
       const dataRawValue = this.form.getRawValue();
       const heroData: Hero = {
         ...dataRawValue,
@@ -94,14 +89,11 @@ export class HeroFormComponent implements OnInit {
       if (this.isEditMode()) {
         this.heroService.update(heroData).subscribe(() => {
           this.isSaving.set(false);
-          this.loadingService.hide();
           this.router.navigate(['/heroes']);
         });
       } else {
-        // heroData.id = this.heroService.generateId();
         this.heroService.create(heroData).subscribe(() => {
           this.isSaving.set(false);
-          this.loadingService.hide();
           this.router.navigate(['/heroes']);
         });
       }

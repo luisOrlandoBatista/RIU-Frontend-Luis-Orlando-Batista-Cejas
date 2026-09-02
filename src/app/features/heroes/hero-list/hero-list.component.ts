@@ -14,7 +14,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { HeroService } from '../../../core/services/hero.service';
 import { Hero } from '../../../models/hero.model';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-hero-list',
@@ -35,7 +34,6 @@ export class HeroListComponent implements OnInit {
   private readonly heroService = inject(HeroService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
-  private readonly loadingService = inject(LoadingService);
 
   readonly heroes = signal<Hero[]>([]);
   readonly isLoading = signal(true);
@@ -50,7 +48,7 @@ export class HeroListComponent implements OnInit {
   private currentPageSize = this.pageSize;
 
   ngOnInit(): void {
-    this.loadHeroes();
+    this.getHeroes();
 
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
@@ -76,13 +74,12 @@ export class HeroListComponent implements OnInit {
   }
 
   deleteHero(hero: Hero): void {
-    const message = '¿Estás seguro de que quieres eliminar a ' + hero.heroName;
-    const ref = this.dialog.open(ConfirmDialogComponent, {
+    this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
         title: 'Eliminar héroe',
-        message: message
-      },
+        message: `¿Estás seguro de que quieres eliminar a ${hero.heroName}?`
+      }
     }).afterClosed().subscribe((modified: boolean) => {
       if (modified) {
         this.isLoading.set(true);
@@ -93,18 +90,12 @@ export class HeroListComponent implements OnInit {
     });
   }
 
-  private loadHeroes(): void {
-    this.getHeroes();
-  }
-
-  private getHeroes(term: string = ''): void {
+  private getHeroes(searchText: string = ''): void {
     this.isLoading.set(true);
-    this.loadingService.show();
-    this.heroService.search(term, this.currentPage, this.currentPageSize).subscribe(result => {
+    this.heroService.search(searchText, this.currentPage, this.currentPageSize).subscribe(result => {
       this.heroes.set(result.data);
       this.totalHeroes.set(result.total);
       this.isLoading.set(false);
-      this.loadingService.hide();
     });
   }
 }

@@ -1,7 +1,9 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { Hero, PageResult, Universe } from '../../models/hero.model';
 import { HeroService } from './hero.service';
+import { mockBackendInterceptor } from '../interceptors/mock-backend.interceptor';
 
 const DELAY = 1000;
 const PAGE = 0;
@@ -11,7 +13,11 @@ describe('HeroService', () => {
   let service: HeroService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(withInterceptors([mockBackendInterceptor])),
+      ],
+    });
     service = TestBed.inject(HeroService);
   });
 
