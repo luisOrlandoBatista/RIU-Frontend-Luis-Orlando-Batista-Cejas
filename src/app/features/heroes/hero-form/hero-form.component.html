@@ -13,16 +13,31 @@
       <mat-form-field appearance="outline">
         <mat-label>Nombre real</mat-label>
         <input matInput formControlName="name" placeholder="Ej: Peter Parker">
+        @if (name.hasError('required')) {
+          <mat-error>Este campo es obligatorio.</mat-error>
+        } @else if (name.hasError('minlength')) {
+          <mat-error>Mínimo 2 caracteres.</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Nombre de superhéroe</mat-label>
         <input matInput formControlName="heroName" placeholder="Ej: Spider-Man">
+        @if (heroName.hasError('required')) {
+          <mat-error>Este campo es obligatorio.</mat-error>
+        } @else if (heroName.hasError('minlength')) {
+          <mat-error>Mínimo 2 caracteres.</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Poder principal</mat-label>
         <input matInput formControlName="power" placeholder="Ej: Trepar paredes">
+        @if (power.hasError('required')) {
+          <mat-error>Este campo es obligatorio.</mat-error>
+        } @else if (power.hasError('minlength')) {
+          <mat-error>Mínimo 2 caracteres.</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -32,6 +47,9 @@
             <mat-option [value]="universe">{{ universe }}</mat-option>
           }
         </mat-select>
+        @if (universe.hasError('required')) {
+          <mat-error>Este campo es obligatorio.</mat-error>
+        }
       </mat-form-field>
 
       <div class="flex justify-end gap-3 pt-2">
@@ -39,8 +57,8 @@
           Cancelar
         </button>
         <button mat-flat-button type="submit" [disabled]="form.invalid || isSaving()">
-          @if (isSaving() || true) {
-            <mat-spinner class="opacity-50" disabled diameter="18" />
+          @if (isSaving()) {
+            <mat-spinner class="opacity-50" diameter="18" />
           } @else {
             Guardar
           }

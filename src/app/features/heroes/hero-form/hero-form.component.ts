@@ -34,11 +34,27 @@ export class HeroFormComponent {
 
   readonly form = new FormGroup({
     id: new FormControl(''),
-    name: new FormControl('', { nonNullable: true, validators: Validators.required }),
-    heroName: new FormControl('', { nonNullable: true, validators: Validators.required }),
-    power: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
+    heroName: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
+    power: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
     universe: new FormControl(Universe.OTHER, { nonNullable: true, validators: Validators.required }),
   });
+
+  get name() {
+    return (this.form.get('name') as FormControl);
+  }
+
+  get heroName() {
+    return (this.form.get('heroName') as FormControl);
+  }
+
+  get power() {
+    return (this.form.get('power') as FormControl);
+  }
+
+  get universe() {
+    return (this.form.get('universe') as FormControl);
+  }
 
   onSubmit(): void {
     if (this.form.invalid) return;
