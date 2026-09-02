@@ -1,58 +1,65 @@
-<div class="hero-list-container">
-  <h1>Super Héroes</h1>
+<div class="mx-auto container container-lg max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 
-  <mat-form-field appearance="outline" class="search-field">
-    <mat-label>Buscar héroe</mat-label>
-    <input matInput [formControl]="searchControl" placeholder="Nombre o superhéroe...">
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
+  <h1 class="mb-6 text-3xl font-bold mt-4 text-gray-800">Super Héroes</h1>
+
+  <div class="mb-4">
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Buscar héroe</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="Nombre o superhéroe...">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
 
   @if (isLoading()) {
-    <div class="loading-wrapper">
+    <div class="flex flex-col items-center gap-4 py-16 text-gray-500">
       <mat-spinner diameter="48" />
       <p>Cargando héroes...</p>
     </div>
   } @else {
-    <table mat-table [dataSource]="heroes()">
+    <div class="overflow-x-auto rounded-lg shadow-sm">
+      <table mat-table [dataSource]="heroes()" class="w-full">
 
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Nombre</th>
-        <td mat-cell *matCellDef="let hero">{{ hero.name }}</td>
-      </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
+          <td mat-cell *matCellDef="let hero">{{ hero.name }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="heroName">
-        <th mat-header-cell *matHeaderCellDef>Superhéroe</th>
-        <td mat-cell *matCellDef="let hero">{{ hero.heroName }}</td>
-      </ng-container>
+        <ng-container matColumnDef="heroName">
+          <th mat-header-cell *matHeaderCellDef>Super héroe</th>
+          <td mat-cell *matCellDef="let hero" class="font-medium">{{ hero.heroName }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="power">
-        <th mat-header-cell *matHeaderCellDef>Poder</th>
-        <td mat-cell *matCellDef="let hero">{{ hero.power }}</td>
-      </ng-container>
+        <ng-container matColumnDef="power">
+          <th mat-header-cell *matHeaderCellDef>Poder</th>
+          <td mat-cell *matCellDef="let hero" class="text-sm text-gray-600">{{ hero.power }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="universe">
-        <th mat-header-cell *matHeaderCellDef>Universo</th>
-        <td mat-cell *matCellDef="let hero">{{ hero.universe }}</td>
-      </ng-container>
+        <ng-container matColumnDef="universe">
+          <th mat-header-cell *matHeaderCellDef>Universo</th>
+          <td mat-cell *matCellDef="let hero">{{ hero.universe }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let hero">
-          <button mat-icon-button>
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="w-24">Acciones</th>
+          <td mat-cell *matCellDef="let hero">
+            <div class="flex items-center gap-1">
+              <button mat-icon-button>
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+      </table>
+    </div>
 
     @if (totalHeroes() === 0) {
-      <p class="no-results">No se encontraron héroes.</p>
+      <p class="py-8 text-center text-gray-500">No se encontraron héroes.</p>
     }
   }
 
