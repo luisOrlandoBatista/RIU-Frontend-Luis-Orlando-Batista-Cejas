@@ -21,4 +21,8 @@ export const routes: Routes = [
     redirectTo: 'heroes',
     pathMatch: 'full',
   },
+  {
+    path: '**',
+    redirectTo: 'heroes',
+  },
 ];
