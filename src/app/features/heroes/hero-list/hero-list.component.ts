@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
@@ -80,13 +80,14 @@ export class HeroListComponent implements OnInit {
         title: 'Eliminar héroe',
         message: `¿Estás seguro de que quieres eliminar a ${hero.heroName}?`
       }
-    }).afterClosed().subscribe((modified: boolean) => {
-      if (modified) {
+    }).afterClosed().pipe(
+      filter(confirmed => confirmed === true),
+      switchMap(() => {
         this.isLoading.set(true);
-        this.heroService.delete(hero.id).subscribe(() => {
-          this.getHeroes(this.searchControl.value ?? '');
-        });
-      }
+        return this.heroService.delete(hero.id);
+      }),
+    ).subscribe(() => {
+      this.getHeroes(this.searchControl.value ?? '');
     });
   }
 

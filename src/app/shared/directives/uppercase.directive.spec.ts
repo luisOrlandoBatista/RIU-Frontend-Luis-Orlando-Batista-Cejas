@@ -78,7 +78,7 @@ describe('UppercaseDirective', () => {
 
       // Disparamos ngAfterViewInit manualmente
       const directive = Object.assign(Object.create(UppercaseDirective.prototype), {
-        el: { nativeElement: input },
+        element: { nativeElement: input },
         control: { control: host.control },
       });
       directive.ngAfterViewInit();
@@ -92,7 +92,7 @@ describe('UppercaseDirective', () => {
       const setValueSpy = spyOn(host.control, 'setValue').and.callThrough();
 
       const directive = Object.assign(Object.create(UppercaseDirective.prototype), {
-        el: { nativeElement: input },
+        element: { nativeElement: input },
         control: { control: host.control },
       });
       directive.ngAfterViewInit();
@@ -106,7 +106,7 @@ describe('UppercaseDirective', () => {
       const setValueSpy = spyOn(host.control, 'setValue').and.callThrough();
 
       const directive = Object.assign(Object.create(UppercaseDirective.prototype), {
-        el: { nativeElement: input },
+        element: { nativeElement: input },
         control: { control: host.control },
       });
       directive.ngAfterViewInit();
@@ -147,7 +147,7 @@ describe('UppercaseDirective', () => {
       nativeInput.value = 'captain america';
 
       const directive = Object.assign(Object.create(UppercaseDirective.prototype), {
-        el: { nativeElement: nativeInput },
+        element: { nativeElement: nativeInput },
         control: null,
       });
 
