@@ -90,7 +90,7 @@ export class HeroListComponent implements OnInit {
     });
   }
 
-  private getHeroes(searchText: string = ''): void {
+  private getHeroes(searchText = ''): void {
     this.isLoading.set(true);
     this.heroService.search(searchText, this.currentPage, this.currentPageSize).subscribe(result => {
       this.heroes.set(result.data);

@@ -10,5 +10,4 @@ import { MatButtonModule } from '@angular/material/button';
 export class ConfirmDialogComponent {
   readonly data = inject<{ title: string, message: string }>(MAT_DIALOG_DATA);
 
-  constructor() { }
 }
