@@ -50,7 +50,7 @@ describe('HeroListComponent', () => {
   });
 
   it('deberia llamar a search al inicio', () => {
-    expect(heroService.search).toHaveBeenCalledWith('', 0, 5);
+    expect(heroService.search).toHaveBeenCalledWith('', 0, 3);
   });
 
   it('deberia mostrar los heroes en la tabla', () => {
