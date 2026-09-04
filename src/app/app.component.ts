@@ -11,5 +11,5 @@ import { LoadingService } from './core/services/loading.service';
   templateUrl: './app.component.html',
 })
 export class AppComponent {
-  readonly loadingService = inject(LoadingService);
+  protected readonly loadingService = inject(LoadingService);
 }

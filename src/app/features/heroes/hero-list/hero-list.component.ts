@@ -41,11 +41,11 @@ export class HeroListComponent implements OnInit {
   readonly heroes = signal<Hero[]>([]);
   readonly isLoading = signal(true);
   readonly totalHeroes = signal(0);
-  readonly displayedColumns = ['name', 'heroName', 'power', 'universe', 'actions'];
+  protected readonly displayedColumns = ['name', 'heroName', 'power', 'universe', 'actions'];
   readonly searchControl = new FormControl('');
 
-  readonly pageSize = 3;
-  readonly pageSizeOptions = [3, 5, 10, 15];
+  protected readonly pageSize = 3;
+  protected readonly pageSizeOptions = [3, 5, 10, 15];
 
   protected readonly currentPage = signal(0);
   private currentPageSize = this.pageSize;

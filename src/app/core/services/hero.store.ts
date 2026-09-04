@@ -4,7 +4,7 @@ import { Hero, Universe } from '../../models/hero.model';
 
 @Injectable({ providedIn: 'root' })
 export class HeroStore {
-  private readonly _heroes = signal<Hero[]>([
+  private readonly heroes = signal<Hero[]>([
     { id: '1', name: 'Peter Parker', heroName: 'Spider-Man', power: 'Trepar paredes', universe: Universe.MARVEL },
     { id: '2', name: 'Clark Kent', heroName: 'Superman', power: 'Super fuerza, vuela',universe: Universe.DC },
     { id: '3', name: 'Tony Stark', heroName: 'Iron Man', power: 'Armadura, tecnología', universe: Universe.MARVEL },
@@ -14,24 +14,24 @@ export class HeroStore {
   ]);
 
   getAll(): Hero[] {
-    return this._heroes();
+    return this.heroes();
   }
 
   findById(id: string): Hero | undefined {
-    return this._heroes().find(h => h.id === id);
+    return this.heroes().find(h => h.id === id);
   }
 
   add(hero: Hero): void {
-    this._heroes.update(current => [...current, hero]);
+    this.heroes.update(current => [...current, hero]);
   }
 
   replace(updated: Hero): void {
-    this._heroes.update(current =>
+    this.heroes.update(current =>
       current.map(h => h.id === updated.id ? updated : h)
     );
   }
 
   remove(id: string): void {
-    this._heroes.update(current => current.filter(h => h.id !== id));
+    this.heroes.update(current => current.filter(h => h.id !== id));
   }
 }

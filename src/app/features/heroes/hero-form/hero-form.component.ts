@@ -33,7 +33,7 @@ export class HeroFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  readonly universes = Object.values(Universe);
+  protected readonly universes = Object.values(Universe);
   readonly isEditMode = signal(false);
   readonly isLoading = signal(false);
   readonly isSaving = signal(false);
@@ -46,17 +46,19 @@ export class HeroFormComponent implements OnInit {
     universe: new FormControl(Universe.OTHER, { nonNullable: true, validators: Validators.required }),
   });
 
-  get name() {
+  protected get name() {
     return this.form.get('name') as FormControl;
   }
 
-  get heroName() {
+  protected get heroName() {
     return this.form.get('heroName') as FormControl;
   }
-  get power()    {
+
+  protected get power() {
     return this.form.get('power') as FormControl;
   }
-  get universe() {
+
+  protected get universe() {
     return this.form.get('universe') as FormControl;
   }
 

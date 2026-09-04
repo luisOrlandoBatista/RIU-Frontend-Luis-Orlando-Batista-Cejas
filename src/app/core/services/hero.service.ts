@@ -7,7 +7,7 @@ import { Hero, PageResult } from '../../models/hero.model';
 @Injectable({ providedIn: 'root' })
 export class HeroService {
   private readonly http = inject(HttpClient);
-  private apiBaseUrl = '/api/heroes';
+  private readonly apiBaseUrl = '/api/heroes';
 
   generateId(): string {
     return crypto.randomUUID();
