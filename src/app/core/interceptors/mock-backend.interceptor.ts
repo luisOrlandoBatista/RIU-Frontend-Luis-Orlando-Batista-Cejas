@@ -16,7 +16,6 @@ export const mockBackendInterceptor: HttpInterceptorFn = (req, next) => {
   const store = inject(HeroStore);
   const { url, method } = req;
 
-  // GET /api/heroes
   if (url === API_BASE && method === 'GET') {
     const searchText = normalize((req.params.get('searchText') ?? '').trim());
     const page = Number(req.params.get('page') ?? 0);
@@ -34,28 +33,24 @@ export const mockBackendInterceptor: HttpInterceptorFn = (req, next) => {
     return of(new HttpResponse({ status: 200, body })).pipe(delay(SIMULATED_DELAY));
   }
 
-  // GET /api/heroes/:id
   if (url.startsWith(`${API_BASE}/`) && method === 'GET') {
     const id = url.split('/').pop()!;
     const hero = store.findById(id) ?? null;
     return of(new HttpResponse({ status: 200, body: hero })).pipe(delay(SIMULATED_DELAY));
   }
 
-  // POST /api/heroes
   if (url === API_BASE && method === 'POST') {
     const hero = req.body as Hero;
     store.add(hero);
     return of(new HttpResponse({ status: 201, body: hero })).pipe(delay(SIMULATED_DELAY));
   }
 
-  // PUT /api/heroes/:id
   if (url.startsWith(`${API_BASE}/`) && method === 'PUT') {
     const hero = req.body as Hero;
     store.replace(hero);
     return of(new HttpResponse({ status: 200, body: hero })).pipe(delay(SIMULATED_DELAY));
   }
 
-  // DELETE /api/heroes/:id
   if (url.startsWith(`${API_BASE}/`) && method === 'DELETE') {
     const id = url.split('/').pop()!;
     store.remove(id);

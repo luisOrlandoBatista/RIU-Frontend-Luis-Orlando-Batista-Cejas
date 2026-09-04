@@ -6,9 +6,9 @@ export enum Universe {
 
 export interface Hero {
   id: string;
-  name: string;      // Nombre de la persona (Peter Parker)
-  heroName: string;  // Nombre de superhéroe (Spider-Man)
-  power: string;     // Por ahora lo dejo como string
+  name: string;
+  heroName: string;
+  power: string;
   universe: Universe;
 }
 
