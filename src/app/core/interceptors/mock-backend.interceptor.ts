@@ -9,21 +9,24 @@ import { HeroStore } from '../services/hero.store';
 const SIMULATED_DELAY = 500;
 const API_BASE = '/api/heroes';
 
+const normalize = (text: string): string =>
+  text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 export const mockBackendInterceptor: HttpInterceptorFn = (req, next) => {
   const store = inject(HeroStore);
   const { url, method } = req;
 
   // GET /api/heroes
   if (url === API_BASE && method === 'GET') {
-    const searchText = (req.params.get('searchText') ?? '').trim().toLowerCase();
+    const searchText = normalize((req.params.get('searchText') ?? '').trim());
     const page = Number(req.params.get('page') ?? 0);
     const pageSize = Number(req.params.get('pageSize') ?? 10);
 
     const heroes = store.getAll();
     const filtered = searchText
       ? heroes.filter((hero: Hero) =>
-          hero.name.toLowerCase().includes(searchText) ||
-          hero.heroName.toLowerCase().includes(searchText)
+          normalize(hero.name).includes(searchText) ||
+          normalize(hero.heroName).includes(searchText)
         )
       : heroes;
     const start = page * pageSize;

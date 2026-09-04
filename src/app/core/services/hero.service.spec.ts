@@ -96,6 +96,30 @@ describe('HeroService', () => {
       expect(result?.data[0].heroName).toBe('Superman');
     }));
 
+    it('debería encontrar héroes ignorando caracteres especiales', fakeAsync(() => {
+      const heroConTilde: Hero = {
+        id: 'acento-test',
+        name: 'José García',
+        heroName: 'El Águila',
+        power: 'Volar',
+        universe: Universe.OTHER,
+      };
+      service.create(heroConTilde).subscribe();
+      tick(DELAY);
+
+      let result: PageResult | undefined;
+      service.search('aguila', PAGE, PAGE_SIZE).subscribe(r => (result = r));
+      tick(DELAY);
+      expect(result?.data.some(h => h.heroName === 'El Águila')).toBeTrue();
+    }));
+
+    it('debería encontrar héroes buscando con tilde cuando el nombre no tiene tilde', fakeAsync(() => {
+      let result: PageResult | undefined;
+      service.search('spíder', PAGE, PAGE_SIZE).subscribe(r => (result = r));
+      tick(DELAY);
+      expect(result?.data.some(h => h.heroName === 'Spider-Man')).toBeTrue();
+    }));
+
     it('debería devolver lista vacía si no hay coincidencias', fakeAsync(() => {
       let result: PageResult | undefined;
       service.search('zzznomatch', PAGE, PAGE_SIZE).subscribe(r => (result = r));

@@ -81,11 +81,14 @@ export class HeroListComponent implements OnInit {
   }
 
   goToPage(event: Event): void {
-    const page = Number((event.target as HTMLInputElement).value);
+    const input = event.target as HTMLInputElement;
+    const page = Number(input.value);
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage.set(page - 1);
       this.paginator.pageIndex = this.currentPage();
       this.getHeroes(this.searchControl.value ?? '');
+    } else {
+      input.value = String(this.currentPage() + 1);
     }
   }
 
