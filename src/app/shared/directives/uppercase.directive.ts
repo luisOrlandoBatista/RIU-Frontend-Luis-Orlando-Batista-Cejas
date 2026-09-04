@@ -5,22 +5,26 @@ import { NgControl } from '@angular/forms';
   selector: 'input[appUppercase]',
 })
 export class UppercaseDirective implements AfterViewInit {
-  private readonly el = inject(ElementRef<HTMLInputElement>);
+  private readonly element = inject(ElementRef<HTMLInputElement>);
   private readonly control = inject(NgControl, { optional: true });
 
 
   ngAfterViewInit(): void {
-    const initial = this.el.nativeElement.value;
+    const initial = this.element.nativeElement.value;
     if (initial && initial !== initial.toUpperCase()) {
-      this.el.nativeElement.value = initial.toUpperCase();
+      this.element.nativeElement.value = initial.toUpperCase();
       this.control?.control?.setValue(initial.toUpperCase(), { emitEvent: false });
     }
   }
 
   @HostListener('input')
   onInput(): void {
-    const upper = this.el.nativeElement.value.toUpperCase();
-    this.el.nativeElement.value = upper;
+    const input = this.element.nativeElement;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const upper = input.value.toUpperCase();
+    input.value = upper;
+    input.setSelectionRange(start, end);
     this.control?.control?.setValue(upper, { emitEvent: true });
   }
 }

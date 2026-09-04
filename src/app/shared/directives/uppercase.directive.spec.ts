@@ -116,6 +116,30 @@ describe('UppercaseDirective', () => {
     });
   });
 
+  describe('posición del cursor al editar en medio del texto', () => {
+    it('debería conservar la posición del cursor tras transformar a mayúsculas', () => {
+      input.value = 'batman';
+      input.setSelectionRange(3, 3);
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+
+      expect(input.value).toBe('BATMAN');
+      expect(input.selectionStart).toBe(3);
+      expect(input.selectionEnd).toBe(3);
+    });
+
+    it('debería conservar una selección parcial en medio del texto', () => {
+      input.value = 'iron man';
+      input.setSelectionRange(2, 5);
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+
+      expect(input.value).toBe('IRON MAN');
+      expect(input.selectionStart).toBe(2);
+      expect(input.selectionEnd).toBe(5);
+    });
+  });
+
   describe('sin FormControl asociado (sin reactive form)', () => {
     it('debería convertir a mayúsculas en el DOM sin lanzar error', () => {
       // La directiva inyecta NgControl como optional, por lo que puede ser null
