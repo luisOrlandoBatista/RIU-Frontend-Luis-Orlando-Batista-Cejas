@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -32,6 +33,7 @@ export class HeroFormComponent implements OnInit {
   private readonly heroService = inject(HeroService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly title = inject(Title);
 
   protected readonly universes = Object.values(Universe);
   readonly isEditMode = signal(false);
@@ -64,6 +66,7 @@ export class HeroFormComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+    this.title.setTitle(id ? 'Editar Héroe' : 'Nuevo Héroe');
     if (id) {
       this.isEditMode.set(true);
       this.isLoading.set(true);

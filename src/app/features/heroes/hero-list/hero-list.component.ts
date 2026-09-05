@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -37,6 +38,7 @@ export class HeroListComponent implements OnInit {
   private readonly heroService = inject(HeroService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+  private readonly title = inject(Title);
 
   readonly heroes = signal<Hero[]>([]);
   readonly isLoading = signal(true);
@@ -55,6 +57,7 @@ export class HeroListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.title.setTitle('Super Héroes');
     this.getHeroes();
 
     this.searchControl.valueChanges.pipe(

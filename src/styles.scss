@@ -19,7 +19,7 @@ body {
   font-family: Roboto, sans-serif;
 }
 
-.mdc-notched-outline__notch {
-  border-right: 0 !important;
+mat-form-field .mdc-notched-outline__notch {
+  border-right: 0;
 }
 
