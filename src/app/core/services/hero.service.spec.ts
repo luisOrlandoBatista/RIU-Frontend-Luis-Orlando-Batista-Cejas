@@ -21,10 +21,10 @@ describe('HeroService', () => {
     service = TestBed.inject(HeroService);
   });
 
-  describe('método getAll', () => {
-    it('debería devolver la primera página de héroes con el total correcto', fakeAsync(() => {
+  describe('método search sin filtro', () => {
+    it('debería devolver la primera página con el total correcto', fakeAsync(() => {
       let result: PageResult | undefined;
-      service.getAll(0, 5).subscribe(r => (result = r));
+      service.search('', 0, 5).subscribe(r => (result = r));
       tick(DELAY);
       expect(result?.data.length).toBe(5);
       expect(result?.total).toBe(6);
@@ -32,7 +32,7 @@ describe('HeroService', () => {
 
     it('debería devolver la segunda página con los héroes restantes', fakeAsync(() => {
       let result: PageResult | undefined;
-      service.getAll(1, 5).subscribe(r => (result = r));
+      service.search('', 1, 5).subscribe(r => (result = r));
       tick(DELAY);
       expect(result?.data.length).toBe(1);
       expect(result?.total).toBe(6);
@@ -40,7 +40,7 @@ describe('HeroService', () => {
 
     it('debería devolver todos los héroes si el pageSize es mayor que el total', fakeAsync(() => {
       let result: PageResult | undefined;
-      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
+      service.search('', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
       expect(result?.data.length).toBe(6);
       expect(result?.total).toBe(6);
@@ -156,7 +156,7 @@ describe('HeroService', () => {
       expect(created?.id).toBe(generatedId);
 
       let result: PageResult | undefined;
-      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
+      service.search('', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
       expect(result?.total).toBe(7);
     }));
@@ -202,7 +202,7 @@ describe('HeroService', () => {
       tick(DELAY);
 
       let result: PageResult | undefined;
-      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
+      service.search('', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
       expect(result?.total).toBe(6);
     }));
@@ -214,7 +214,7 @@ describe('HeroService', () => {
       tick(DELAY);
 
       let result: PageResult | undefined;
-      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
+      service.search('', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
       expect(result?.total).toBe(5);
       expect(result?.data.find(h => h.id === '1')).toBeUndefined();
@@ -225,7 +225,7 @@ describe('HeroService', () => {
       tick(DELAY);
 
       let result: PageResult | undefined;
-      service.getAll(PAGE, PAGE_SIZE).subscribe(r => (result = r));
+      service.search('', PAGE, PAGE_SIZE).subscribe(r => (result = r));
       tick(DELAY);
       expect(result?.total).toBe(6);
     }));

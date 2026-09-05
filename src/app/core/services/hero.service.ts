@@ -13,11 +13,6 @@ export class HeroService {
     return crypto.randomUUID();
   }
 
-  getAll(page: number, pageSize: number): Observable<PageResult> {
-    const params = new HttpParams().set('page', page).set('pageSize', pageSize);
-    return this.http.get<PageResult>(this.apiBaseUrl, { params });
-  }
-
   getById(id: string): Observable<Hero | undefined> {
     return this.http.get<Hero | null>(`${this.apiBaseUrl}/${id}`).pipe(
       map(hero => hero ?? undefined)
