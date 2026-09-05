@@ -2,6 +2,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
 import { of } from 'rxjs';
 
 import { HeroListComponent } from './hero-list.component';
@@ -100,4 +101,63 @@ describe('HeroListComponent', () => {
     tick();
     expect(heroService.delete).not.toHaveBeenCalled();
   }));
+
+  describe('goToPage', () => {
+    beforeEach(() => {
+      component.totalHeroes.set(10); // totalPages = ceil(10/3) = 4
+      fixture.detectChanges();
+    });
+
+    it('debería llamar a search con la página indicada si el valor es válido', fakeAsync(() => {
+      const input = fixture.nativeElement.querySelector('#currentPage') as HTMLInputElement;
+      input.value = '3';
+      input.dispatchEvent(new Event('change'));
+      tick();
+      expect(heroService.search).toHaveBeenCalledWith('', 2, 3);
+    }));
+
+    it('debería restaurar el input y no llamar a search si la página es menor a 1', fakeAsync(() => {
+      const callsBefore = heroService.search.calls.count();
+      const input = fixture.nativeElement.querySelector('#currentPage') as HTMLInputElement;
+      input.value = '0';
+      input.dispatchEvent(new Event('change'));
+      tick();
+      expect(heroService.search.calls.count()).toBe(callsBefore);
+      expect(input.value).toBe('1');
+    }));
+
+    it('debería restaurar el input y no llamar a search si la página supera el total', fakeAsync(() => {
+      const callsBefore = heroService.search.calls.count();
+      const input = fixture.nativeElement.querySelector('#currentPage') as HTMLInputElement;
+      input.value = '99';
+      input.dispatchEvent(new Event('change'));
+      tick();
+      expect(heroService.search.calls.count()).toBe(callsBefore);
+      expect(input.value).toBe('1');
+    }));
+  });
+
+  describe('onPageChange', () => {
+    it('debería llamar a search con la nueva página y nuevo tamaño', fakeAsync(() => {
+      component.onPageChange({ pageIndex: 1, pageSize: 5, length: 10 } as PageEvent);
+      tick();
+      expect(heroService.search).toHaveBeenCalledWith('', 1, 5);
+    }));
+  });
+
+  describe('borrar el único héroe de la última página', () => {
+    it('debería retroceder a la página anterior y buscar desde la página correcta', fakeAsync(() => {
+      heroService.search.and.returnValue(of({ data: [heroes[0]], total: 4 }));
+      component.onPageChange({ pageIndex: 1, pageSize: 3, length: 4 } as PageEvent);
+      tick();
+      fixture.detectChanges();
+
+      dialog.open.and.returnValue({ afterClosed: () => of(true) } as never);
+      heroService.search.and.returnValue(of({ data: heroes, total: 3 }));
+      fixture.nativeElement.querySelector('button[color="warn"]').click();
+      tick();
+
+      expect(heroService.search.calls.mostRecent().args).toEqual(['', 0, 3]);
+    }));
+  });
 });
