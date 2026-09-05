@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -52,11 +52,8 @@ export class HeroListComponent implements OnInit {
   protected readonly pageSizeOptions = [3, 5, 10, 15];
 
   protected readonly currentPage = signal(0);
-  private currentPageSize = this.pageSize;
-
-  protected get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalHeroes() / this.currentPageSize));
-  }
+  private readonly currentPageSize = signal(this.pageSize);
+  protected readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalHeroes() / this.currentPageSize())));
 
   ngOnInit(): void {
     this.title.setTitle('Super Héroes');
@@ -69,7 +66,7 @@ export class HeroListComponent implements OnInit {
         this.currentPage.set(0);
         this.isLoading.set(true);
       }),
-      switchMap(term => this.heroService.search(term ?? '', 0, this.currentPageSize)),
+      switchMap(term => this.heroService.search(term ?? '', 0, this.currentPageSize())),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(result => {
       this.heroes.set(result.data);
@@ -80,31 +77,31 @@ export class HeroListComponent implements OnInit {
 
   onPageChange(event: PageEvent): void {
     this.currentPage.set(event.pageIndex);
-    this.currentPageSize = event.pageSize;
+    this.currentPageSize.set(event.pageSize);
     this.getHeroes(this.searchControl.value ?? '');
   }
 
-  newHero(): void {
+  protected newHero(): void {
     this.router.navigate(['/heroes/new']);
   }
 
-  editHero(id: string): void {
+  protected editHero(id: string): void {
     this.router.navigate(['/heroes', id, 'edit']);
   }
 
-  goToPage(event: Event): void {
+  protected goToPage(event: Event): void {
     const input = event.target as HTMLInputElement;
     const page = Number(input.value);
-    if (page >= 1 && page <= this.totalPages) {
+    if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page - 1);
-      this.paginator.pageIndex = this.currentPage();
+      if (this.paginator) this.paginator.pageIndex = this.currentPage();
       this.getHeroes(this.searchControl.value ?? '');
     } else {
       input.value = String(this.currentPage() + 1);
     }
   }
 
-  deleteHero(hero: Hero): void {
+  protected deleteHero(hero: Hero): void {
     this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
@@ -120,7 +117,7 @@ export class HeroListComponent implements OnInit {
     ).subscribe(() => {
       if (this.heroes().length === 1 && this.currentPage() > 0) {
         this.currentPage.update(p => p - 1);
-        this.paginator.pageIndex = this.currentPage();
+        if (this.paginator) this.paginator.pageIndex = this.currentPage();
       }
       this.getHeroes(this.searchControl.value ?? '');
     });
@@ -128,7 +125,7 @@ export class HeroListComponent implements OnInit {
 
   private getHeroes(searchText = ''): void {
     this.isLoading.set(true);
-    this.heroService.search(searchText, this.currentPage(), this.currentPageSize).subscribe(result => {
+    this.heroService.search(searchText, this.currentPage(), this.currentPageSize()).subscribe(result => {
       this.heroes.set(result.data);
       this.totalHeroes.set(result.total);
       this.isLoading.set(false);

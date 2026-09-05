@@ -64,18 +64,18 @@
         <ng-container matColumnDef="footer">
           <td mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length" class="p-0">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              @if (totalPages > 1) {
+              @if (totalPages() > 1) {
                 <div class="flex items-center gap-2 pl-4 text-sm ">
                   <label for="currentPage">Ir a página:</label>
                   <input
                     id="currentPage"
                     type="number"
                     min="1"
-                    [max]="totalPages"
+                    [max]="totalPages()"
                     [value]="currentPage() + 1"
                     class="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm"
                     (change)="goToPage($event)">
-                  <span>de {{ totalPages }}</span>
+                  <span>de {{ totalPages() }}</span>
                 </div>
               }
               <mat-paginator
