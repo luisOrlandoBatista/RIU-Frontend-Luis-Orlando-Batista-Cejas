@@ -3,7 +3,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import { HeroListComponent } from './hero-list.component';
 import { HeroService } from '../../../core/services/hero.service';
@@ -59,17 +59,22 @@ describe('HeroListComponent', () => {
     expect(rows.length).toBe(2);
   });
 
-  it('deberia mostrar el spinner cuando isLoading es true', () => {
-    component.isLoading.set(true);
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('mat-spinner')).toBeTruthy();
-  });
+  it('deberia mostrar el spinner durante la carga y ocultarlo al completar', fakeAsync(() => {
+    const subject = new Subject<{ data: Hero[], total: number }>();
+    heroService.search.and.returnValue(subject.asObservable());
 
-  it('deberia ocultar el spinner cuando carga termina', () => {
-    component.isLoading.set(false);
+    component.onPageChange({ pageIndex: 0, pageSize: 3, length: 2 } as PageEvent);
     fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('mat-spinner')).toBeTruthy();
+
+    subject.next({ data: heroes, total: 2 });
+    subject.complete();
+    tick();
+    fixture.detectChanges();
+
     expect(fixture.nativeElement.querySelector('mat-spinner')).toBeNull();
-  });
+  }));
 
   it('deberia ir a crear heroe nuevo', () => {
     fixture.nativeElement.querySelector('button[mat-flat-button]').click();
@@ -103,10 +108,12 @@ describe('HeroListComponent', () => {
   }));
 
   describe('goToPage', () => {
-    beforeEach(() => {
-      component.totalHeroes.set(10); // totalPages = ceil(10/3) = 4
+    beforeEach(fakeAsync(() => {
+      heroService.search.and.returnValue(of({ data: heroes, total: 10 }));
+      component.onPageChange({ pageIndex: 0, pageSize: 3, length: 10 } as PageEvent);
+      tick();
       fixture.detectChanges();
-    });
+    }));
 
     it('debería llamar a search con la página indicada si el valor es válido', fakeAsync(() => {
       const input = fixture.nativeElement.querySelector('#currentPage') as HTMLInputElement;

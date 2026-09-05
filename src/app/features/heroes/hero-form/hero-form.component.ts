@@ -36,9 +36,9 @@ export class HeroFormComponent implements OnInit {
   private readonly title = inject(Title);
 
   protected readonly universes = Object.values(Universe);
-  readonly isEditMode = signal(false);
-  readonly isLoading = signal(false);
-  readonly isSaving = signal(false);
+  protected readonly isEditMode = signal(false);
+  protected readonly isLoading = signal(false);
+  protected readonly isSaving = signal(false);
 
   readonly form = new FormGroup({
     id: new FormControl(''),

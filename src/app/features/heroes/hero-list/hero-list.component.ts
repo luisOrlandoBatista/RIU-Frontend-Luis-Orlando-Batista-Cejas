@@ -42,11 +42,11 @@ export class HeroListComponent implements OnInit {
   private readonly title = inject(Title);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly heroes = signal<Hero[]>([]);
-  readonly isLoading = signal(true);
-  readonly totalHeroes = signal(0);
+  protected readonly heroes = signal<Hero[]>([]);
+  protected readonly isLoading = signal(true);
+  protected readonly totalHeroes = signal(0);
   protected readonly displayedColumns = ['name', 'heroName', 'power', 'universe', 'actions'];
-  readonly searchControl = new FormControl('');
+  protected readonly searchControl = new FormControl('');
 
   protected readonly pageSize = 3;
   protected readonly pageSizeOptions = [3, 5, 10, 15];
@@ -54,7 +54,7 @@ export class HeroListComponent implements OnInit {
   protected readonly currentPage = signal(0);
   private currentPageSize = this.pageSize;
 
-  get totalPages(): number {
+  protected get totalPages(): number {
     return Math.max(1, Math.ceil(this.totalHeroes() / this.currentPageSize));
   }
 
