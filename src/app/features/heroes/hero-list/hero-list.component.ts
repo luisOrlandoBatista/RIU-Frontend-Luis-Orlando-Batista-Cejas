@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,6 +40,7 @@ export class HeroListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly title = inject(Title);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly heroes = signal<Hero[]>([]);
   readonly isLoading = signal(true);
@@ -63,9 +65,16 @@ export class HeroListComponent implements OnInit {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-    ).subscribe(term => {
-      this.currentPage.set(0);
-      this.getHeroes(term ?? '');
+      tap(() => {
+        this.currentPage.set(0);
+        this.isLoading.set(true);
+      }),
+      switchMap(term => this.heroService.search(term ?? '', 0, this.currentPageSize)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(result => {
+      this.heroes.set(result.data);
+      this.totalHeroes.set(result.total);
+      this.isLoading.set(false);
     });
   }
 
